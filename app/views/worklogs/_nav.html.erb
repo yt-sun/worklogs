@@ -1,5 +1,5 @@
 <div class="contextual">
-	<%= link_to(l(:label_worklog_new),new_worklog_path(),:class => 'icon icon-add' ) + ' |'%>
-	<%= link_to(l(:label_worklog_my), worklogs_my_path) + ' |'  %>
-	<%= link_to(l(:label_all_worklog), worklogs_path) %>
+	<%= link_to(l(:label_worklog_new),new_worklog_path(:typee => 1),:class => 'icon icon-add' ) + ' |' + @week if(false || User.current.allowed_to?({:controller => "worklogs", :action => "new"},nil,{:global => true}))%>
+	<%= link_to(l(:label_worklog_my), worklogs_my_path) + ' |'%>
+	<%= link_to(l(:label_all_worklog), worklogs_path) if User.current.allowed_to?({:controller => "worklogs", :action => "index"},nil,{:global => true})%>
 </div>

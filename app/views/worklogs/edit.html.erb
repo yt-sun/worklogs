@@ -4,7 +4,7 @@
 
 <%= labelled_form_for @worklog, :url => worklogs_path(:id=>@worklog.id),:html => { :id => 'worklog-form' } do |f| %>
   <%= render :partial => 'form', :locals => {:f => f} %>
-  <%= submit_tag l(:button_create) %>
+  <%= submit_tag l(:button_submit) %>
   <%= preview_link preview_worklogs_path(), 'worklog-form' %>
 <% end %>
 <div id="preview" class="worklog"></div>
@@ -12,6 +12,6 @@
 
 <% content_for :sidebar do %>
 	<%=render :partial => "sidebar" %>
-<% end %>
+<% end if User.current.allowed_to?({:controller => "worklogs", :action => "index"},nil,{:global => true}) %>
 
 <% html_title "#{l(:label_worklog_edit)} - #{l(:label_worklog)}" %>

@@ -78,6 +78,9 @@ class WorklogsController < ApplicationController
 
   def new
     @day = Date.today
+    @week = Date.today.strftime("%W").to_i
+    @month = Date.today.strftime("%m").to_i
+    @year =  Date.today.strftime("%Y").to_i
     @day_todo = Worklog.where("user_id = ? and day <> ? and typee = ?", session[:user_id],Date.today,0).last
     @week_todo = Worklog.where("user_id = ? and day <> ? and typee = ?", session[:user_id],Date.today,1).last
     @month_todo = Worklog.where("user_id = ? and day <> ? and typee = ?", session[:user_id],Date.today,2).last
@@ -89,25 +92,92 @@ class WorklogsController < ApplicationController
     # else
     #   @worklog = Worklog.new()      
     # end
-    @worklog = Worklog.new()    
-    @worklog.typee = 1  
+    #@worklog = Worklog.new()    
+    #@worklog.typee = 1  
+
+    @typee = params[:typee].to_i
+    logger.info("New worklog with typee = #{@typee}")
+    case @typee
+        when 0
+	    logger.info("0")
+	    @wl = Worklog.where("user_id = ? and typee = ? and day = ?", session[:user_id], @typee, @day).first
+        when 1
+	    logger.info("1")
+	    @wl = Worklog.where("user_id = ? and typee = ? and week = ? and year = ?", session[:user_id], @typee, @week, @year).first
+        when 2
+	    logger.info("2")
+	    @wl = Worklog.where("user_id = ? and typee = ? and month = ? and year = ?", session[:user_id], @typee, @month, @year).first
+        when 3
+	    logger.info("3")
+	    @wl = Worklog.where("user_id = ? and typee = ? and year = ?", session[:user_id], @typee, @year).first
+        else
+	    logger.info("other")
+            @typee = 1
+            @wl = Worklog.where("user_id = ? and typee = ? and week = ? and year = ?", session[:user_id], @typee, @week, @year).first
+    end
+
+    if @wl
+        redirect_to :action => 'edit', :id => @wl.id
+    else
+        @worklog = Worklog.new()
+        @worklog.typee = @typee
+    end
   end
   
   
   def edit
     @day = Date.today
+    @week = Date.today.strftime("%W").to_i
+    @month = Date.today.strftime("%m").to_i
+    @year =  Date.today.strftime("%Y").to_i
+
     @day_todo = Worklog.where("user_id = ? and day <> ? and typee = ?", session[:user_id],Date.today,0).last
-    @week_todo = Worklog.where("user_id = ? and day <> ? and typee = ?", session[:user_id],Date.today,1).last
+    @week_todo = Worklog.where("user_id = ? and ( week <> ? or year <> ? )and typee = ?", session[:user_id], @week, @year, 1).last
+    @month_todo = Worklog.where("user_id = ? and ( month <> ? or year <> ? ) and typee = ?", session[:user_id], @month, @year, 2).last
+    @year_todo = Worklog.where("user_id = ? and year <> ? and typee = ?", session[:user_id], @year, 3).last
+
+    @id = params[:id].to_i
+    logger.info("Edit worklog id:#{@id}")
+    @wl = Worklog.where("id = ?", @id).first
+    if @wl
+	if @wl.user_id != session[:user_id]
+	    flash[:error] = "无访问权限"
+	    redirect_to worklogs_path()
+	    return
+	end
+    else
+	flash[:error] = "无数据"
+	redirect_to worklogs_path()
+        return
+    end
+
+    if @wl.typee == 0 && @wl.day == @day
+    elsif @wl.typee == 1 && @wl.week == @week && @wl.year == @year
+    elsif @wl.typee == 2 && @wl.month == @month && @wl.year = @year
+    elsif @wl.typee == 3 && @wl.year == @year
+    else
+	flash[:error] = "不允许编辑过往的内容"
+	redirect_to worklog_path(:id => @wl.id)
+    end
 
   end
 
   def show
+    @id = params[:id].to_i
+    logger.info("show worklog id#{@id}")
+    @wl = Worklog.where("id = ?", @id).first
+    if (@wl.user_id != User.current.id) && !User.current.allowed_to?({:controller => "worklogs", :action=> "index" }, nil, {:global => true })
+        flash[:error] = "不允许查看其他人的日志"
+        redirect_to worklogs_path()
+	return 404
+    end
     @worklog_reviews = @worklog.worklog_reviews
     @worklog_review = WorklogReview.new()
   end
   
 
   def review
+    logger.info("review")
     @worklog_reviews = WorklogReview.new(params[:worklog_review])
     @worklog_reviews.user = User.current
     @worklog_reviews.worklog = @worklog

@@ -3,6 +3,9 @@
 	
 <h2><%=worklogs_title(params[:typee])%></h2>
 <%@worklogs.each do |w|%>
+<!--<%if !can_list?(w)%>
+  <%next%>
+<%end%>-->
 <h3>
 	<%= avatar(w.author, :size => "18")%> 
 	<%=worklogs_index_title(w.typee)%>:
@@ -11,8 +14,8 @@
 
 </h3>
 <div class="contextual">
-<%=link_to "", {:action => 'edit', :id => w.id}, :class => 'icon icon-edit', :accesskey => accesskey(:edit) if can_edit?(w)%>
-<%=link_to "详情&评价",worklog_path(:id=>w.id)%>
+<%=link_to "编辑", {:action => 'edit', :id => w.id}, :class => 'icon icon-edit', :accesskey => accesskey(:edit) if can_edit?(w)%>
+<%=link_to "评价", worklog_path(:id=>w.id) if can_vote?(w)%>
 </div>
 
 
@@ -59,7 +62,7 @@
 	<table width="100%">
 		<%w.worklog_reviews.each do |wr|%>
 		<tr>
-			<td BGCOLOR="#eee">Leader评价: <%=score_text wr.score%> , <%= authoring wr.created_at, wr.user %></td>
+			<td BGCOLOR="#eee">评价: <%=score_text wr.score%> , <%= authoring wr.created_at, wr.user %></td>
 		</tr>
 		<tr>
 			<td><%= textilizable(wr.review) %></td>
@@ -75,7 +78,7 @@
 
 <% content_for :sidebar do %>
 	<%=render :partial => "sidebar" %>
-<% end %>
+<% end if User.current.allowed_to?({:controller => "worklogs", :action => "index"},nil,{:global => true}) %>
  
 
 <% html_title "#{l(:label_worklog)}" %>

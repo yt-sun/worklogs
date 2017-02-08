@@ -1,24 +1,15 @@
 <%= error_messages_for @worklog %>
 
-<div class="box tabular"> 
+<div class="box tabular" style="display:none">
 
 <p><%= l(:field_day) %>: <%=@day%></p>
-<p><%= f.select(:typee, Worklog.typee_collection, {:class=>'wiki-edit',:required => true}, :onchange=>"hiddenScore(this.value)")%> </p>
+<p><%= f.select(:typee, Worklog.typee_collection, {:class=>'wiki-edit',:required => true}, :onchange=>"hiddenScore(this.value)")%></p>
 </div>
 
 
 <div class="worklog_todo"> 
 <fieldset>
-<legend>Plan Todo</legend>
-<div class="worklog_item" id="todo_day" style="display:<%=(@worklog && @worklog.typee == 0) ? 'block' : 'none'%>;padding-left:180px;">
-	<h4><%=l(:index_item_next_day_plan_todo)%></h4>
-	<%if @day_todo && !@day_todo.todo.blank?%>
-		<%= textilizable(@day_todo.todo) %>
-	<%else%>
-		<%=l(:text_no_day_plan)%>
-	<%end%>
-</div>
-
+<legend>上周计划</legend>
 <div class="worklog_item" id="todo_week" style="display:<%=(@worklog && @worklog.typee == 1) ? 'block' : 'none'%>;padding-left:180px;">
 	<h4><%=l(:index_item_next_week_plan_todo)%></h4>
 	<%if @week_todo && !@week_todo.todo.blank?%>
@@ -28,38 +19,17 @@
 	<%end%>
 </div>
 
-<div class="worklog_item" id="todo_month" style="display:<%=(@worklog && @worklog.typee == 2) ? 'block' : 'none'%>;padding-left:180px;">
-	<h4><%=l(:index_item_next_month_plan_todo)%></h4>
-	<%if @month_todo && !@month_todo.todo.blank?%>
-		<%= textilizable(@month_todo.todo) %>
-	<%else%>
-		<%=l(:text_no_month_plan)%>
-	<%end%>
-</div>
-
-<div class="worklog_item" id="todo_year" style="display:<%=(@worklog && @worklog.typee == 3) ? 'block' : 'none'%>;padding-left:180px;">
-	<h4><%=l(:index_item_next_year_plan_todo)%></h4>
-	<%if @year_todo && !@year_todo.todo.blank?%>
-		<%= textilizable(@year_todo.todo) %>
-	<%else%>
-		<%=l(:text_no_year_plan)%>
-	<%end%>
-</div>
-
 </fieldset>
 </div>
 <br />
 
 
  
-
-<div class="box tabular" id="week" style="display:<%=(@worklog && @worklog.typee == 0) ? 'none' : 'block'%>;"> 
+<div id="iweek" class="box tabular">
 	<fieldset>
 		<legend>工作日志</legend>
-
-		
-		<p><%= f.text_area :do, :required => true, :cols => 40, :value => "#{@worklog.do || l(:text_plan_done)}",:rows => 15, :class => 'wiki-edit' %></p>
-		<p><%= f.text_area :todo, :required => true, :cols => 40, :value => "#{@worklog.todo || l(:text_plan)}",:rows => 10, :class => 'wiki-edit' %></p>
+		<p><%= f.text_area :do, :required => true, :cols => 40, :value => "#{@worklog.do}",:rows => 15, :class => 'wiki-edit' %></p>
+		<p><%= f.text_area :todo, :required => true, :cols => 40, :value => "#{@worklog.todo}",:rows => 10, :class => 'wiki-edit' %></p>
 		<p><%= f.text_area :feel, :required => false, :cols => 40, :rows => 5, :class => 'wiki-edit' %></p>
 	</fieldset>
 
@@ -70,8 +40,6 @@
 		<p><%= f.text_area :nogood, :required => false, :cols => 40, :rows => 5, :class => 'wiki-edit',:required => true %></p>
 	</fieldset>
 </div>
-
-
 
 <%= wikitoolbar_for 'worklog_do' %>
 <%= wikitoolbar_for 'worklog_plan_done' %>

@@ -1,5 +1,5 @@
 <%=render :partial => "nav" %>
-<h2>周报详情</h2>
+<h2>日志详情</h2>
 
 <p class="author"><%= authoring @worklog.created_at, @worklog.author %> </p>
 
@@ -42,7 +42,7 @@
 
 </div>
 
-<h3>Leader评价</h3>
+<h3>评价</h3>
 <div class="box"> 
 	<%@worklog_reviews.each do |cl|%>
 		<fieldset>
@@ -52,9 +52,9 @@
 	<%end%>
 </div>
 
-<div class="box tabular"> 
+<div class="box tabular" style="display:<%=can_vote?(@worklog) ? 'block' : 'none'%>"> 
 <fieldset>
-<legend>Leader评价</legend>
+<legend>发表评价</legend>
 
 <%= labelled_form_for @worklog_review, :url => review_worklog_path(:id=>@worklog.id), :html => { :id => 'worklog_review-form' } do |f| %>
 	
@@ -76,4 +76,4 @@
 
 <% content_for :sidebar do %>
 	<%=render :partial => "sidebar" %>
-<% end %>
+<% end if User.current.allowed_to?({:controller => "worklogs", :action => "index"},nil,{:global => true}) %>

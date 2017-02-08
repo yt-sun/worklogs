@@ -9,6 +9,20 @@ module WorklogsHelper
       return false
   end
   
+  def can_vote?(worklog)
+    if (worklog.user_id != session[:user_id]) && User.current.allowed_to?({:controller => "worklogs", :action=> "vote" }, nil, {:global => true })
+      return true
+    end
+    return false
+  end
+ 
+  def can_list?(worklog)
+    if (worklog.user_id == session[:user_id]) || User.current.allowed_to?({:controller => "worklogs", :action=> "index" }, nil, {:global => true })
+      return true
+    end
+    return false
+  end
+ 
   def worklogs_title(typee=nil)
     if typee == "0"
       return l(:worklogs_title_day)
