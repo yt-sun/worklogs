@@ -17,8 +17,8 @@
 	<% @start.step(@last,-7) do |archive| 
 	year = archive.strftime("%Y")	
 	week = archive.strftime("%W") -%>	
-	<%=link_to "#{year}年#{week}周",{:controller=>"worklogs",:action=>"index",:week=>week,:user_id=>params[:user_id],:typee=>params[:typee]},{} %><br />
-	<% end %>
+	<%=link_to "#{year}年#{week}周",{:controller=>"worklogs",:action=>"index",:year=>year,:week=>week,:user_id=>params[:user_id],:typee=>params[:typee]},{} %><br />
+	<% end %> 	
   </div>
 </fieldset>
 

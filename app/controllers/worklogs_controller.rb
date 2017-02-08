@@ -14,6 +14,7 @@ class WorklogsController < ApplicationController
     @last ||= Date.today
     # @last = Date.new(@start_topic.year,@start_topic.mon,1)
     @start=Date.today
+    @last = @start - 92 if @last < @start - 92
     scope = User.logged.status(1)
     @users =  scope.order("id asc").all - Worklog.no_need_users
   end
@@ -25,7 +26,11 @@ class WorklogsController < ApplicationController
     end
     
     unless @week.blank?
-      worklogs_scope = worklogs_scope.where(:week => @week)
+      if @year.blank?
+        worklogs_scope = worklogs_scope.where(:week => @week, :year => Time.now.year)
+      else
+        worklogs_scope = worklogs_scope.where(:week => @week, :year => @year)
+      end
     end
     
     unless @typee.blank?
@@ -50,6 +55,7 @@ class WorklogsController < ApplicationController
     @user_id = params[:user_id]
     @week = params[:week]
     @typee = params[:typee]
+    @year = params[:year]
     load_worklogs
   end
   
